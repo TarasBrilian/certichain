@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, FileBadge, FileText, Loader2, Search } from "lucide-react";
+import { Check, Copy, Download, FileBadge, FileText, Loader2, Search } from "lucide-react";
 import { useReadContract } from "wagmi";
 import { bnbSmartChainTestnet } from "@/lib/chains";
 import { CERTICHAIN_ABI, CERTICHAIN_ADDRESS, contractUrl, tokenUrl } from "@/lib/contract";
@@ -144,12 +144,35 @@ export function VerifyDiploma({ initialTokenId = "1" }: { initialTokenId?: strin
           </div>
         ) : verifiedIjazah ? (
           <div className="flex flex-col gap-6">
-            <div className="overflow-hidden rounded-lg border border-[#ffd1ad] bg-white p-3 shadow-sm">
-              <img
-                src={gatewayUrl(verifiedIjazah[2])}
-                alt="Diploma Preview"
-                className="w-full h-auto object-contain rounded"
-              />
+            <div className="flex flex-col gap-3">
+              <div className="overflow-hidden rounded-lg border border-[#ffd1ad] bg-white p-3 shadow-sm">
+                <img
+                  src={gatewayUrl(verifiedIjazah[2])}
+                  alt="Diploma Preview"
+                  className="w-full h-auto object-contain rounded"
+                />
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(gatewayUrl(verifiedIjazah[2]));
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `Diploma-${verifiedIjazah[0] || "download"}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                  } catch (error) {
+                    console.error("Download failed:", error);
+                  }
+                }}
+                className="primary-button flex items-center justify-center gap-2"
+              >
+                <Download size={20} /> Download Diploma PNG
+              </button>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <ResultRow label="Nama" value={verifiedIjazah[0] || "-"} />

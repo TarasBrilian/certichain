@@ -282,16 +282,7 @@ export function IssueDiploma() {
     }
   }
 
-  function downloadPreview() {
-    if (!diplomaImage) {
-      return;
-    }
 
-    const link = document.createElement("a");
-    link.href = diplomaImage;
-    link.download = `${slugifyFile(name)}-certichain-diploma.png`;
-    link.click();
-  }
 
   return (
     <div className="mx-auto mt-6 grid max-w-[1780px] gap-6 xl:grid-cols-[560px_minmax(0,1fr)] px-6">
@@ -391,12 +382,9 @@ export function IssueDiploma() {
             </label>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <button className="secondary-button px-5" onClick={downloadPreview} disabled={!diplomaImage}>
-              <Download size={20} /> Download PNG
-            </button>
+          <div className="grid gap-3">
             <button
-              className="primary-button px-5"
+              className="primary-button w-full px-5"
               onClick={handleMint}
               disabled={!canMint || isUploading || mint.isPending || receipt.isLoading || isSavingDb}
             >
