@@ -15,7 +15,7 @@ Project CertiChain ini mendemokan *real-world use case* tersebut. Peserta *works
 ## 📜 Smart Contract Details
 
 - **Network:** BNB Smart Chain Testnet
-- **Contract Address:** [`0x405CcCda7EFd5AC9D7ae662069359cBfca6Fac6d`](https://testnet.bscscan.com/address/0x405CcCda7EFd5AC9D7ae662069359cBfca6Fac6d)
+- **Contract Address:** [`0x405CcCda7EFd5AC9D7ae662069359cBfca6Fac6d`](https://testnet.bscscan.com/token/0x405CcCda7EFd5AC9D7ae662069359cBfca6Fac6d#code)
 
 ---
 
