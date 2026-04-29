@@ -39,6 +39,26 @@ export function VerifyDiploma({ initialTokenId = "1" }: { initialTokenId?: strin
     }
   }, [initialTokenId]);
 
+  // If user pastes a UUID into the input, resolve it to a Token ID
+  useEffect(() => {
+    const val = verifyTokenId.trim();
+    // UUIDs are 36 chars long and contain hyphens
+    if (val.length === 36 && val.includes("-")) {
+      setLoadingFromUuid(true);
+      fetch(`/api/certificates?uuid=${val}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.certificate?.tokenId) {
+            setVerifyTokenId(String(data.certificate.tokenId));
+          } else {
+            // Optional: Handle case where UUID not found
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoadingFromUuid(false));
+    }
+  }, [verifyTokenId]);
+
   const parsedTokenId = useMemo(() => {
     if (!/^\d+$/.test(verifyTokenId.trim())) {
       return undefined;
@@ -103,8 +123,7 @@ export function VerifyDiploma({ initialTokenId = "1" }: { initialTokenId?: strin
             <input
               value={verifyTokenId}
               onChange={(event) => setVerifyTokenId(event.target.value)}
-              inputMode="numeric"
-              placeholder="1"
+              placeholder="Masukkan Token ID atau UUID"
             />
           </span>
         </label>
