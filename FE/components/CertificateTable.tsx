@@ -90,7 +90,7 @@ export function CertificateTable({ onSelectTokenId }: { onSelectTokenId: (id: st
                 {cert.walletAddress.slice(0, 6)}...{cert.walletAddress.slice(-4)}
               </td>
               <td className="whitespace-nowrap px-6 py-4">
-                {format(new Date(cert.createdAt + 'Z'), "dd MMM yyyy, HH:mm")}
+                {cert.createdAt ? format(new Date(cert.createdAt), "dd MMM yyyy, HH:mm") : "-"}
               </td>
               <td className="whitespace-nowrap px-6 py-4 text-right">
                 {cert.tokenId !== null && (
