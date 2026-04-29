@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg: #fffaf2;
+  --paper: #fffdf8;
+  --ink: #111827;
+  --muted: #6b7280;
+  --line: #ff6b00;
+  --line-soft: #ffd7b8;
+  --amber: #f6b100;
+  --soft: #fff2df;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 24px;
+  background-color: var(--bg);
+}
+
+.line-panel {
+  border: 2px solid var(--line);
+  background: rgba(255, 253, 248, 0.96);
+  box-shadow: 0 18px 60px rgba(17, 24, 39, 0.08);
+}
+
+.corner-cut {
+  clip-path: polygon(
+    14px 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0 calc(100% - 14px),
+    0 14px
+  );
+}
+
+.field-shell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  border: 1.5px solid var(--line);
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 0 14px;
+}
+
+.field-shell input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.field-shell input::placeholder {
+  color: #8a8f98;
+}
+
+.primary-button {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1.5px solid #e85c00;
+  border-radius: 8px;
+  background: #ff6b00;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(255, 107, 0, 0.16);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #f05f00;
+  box-shadow: 0 12px 28px rgba(255, 107, 0, 0.2);
+}
+
+.secondary-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #f05f00;
+  font-weight: 800;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.secondary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--soft);
+}
+
+.icon-box {
+  display: inline-flex;
+  height: 48px;
+  width: 48px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #fff0df;
+  color: #ff6b00;
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.nav-button:hover {
+  color: #f05f00;
+}
+
+.certificate-frame {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  background: #ffffff;
+}
+
+.certificate-frame::before,
+.certificate-frame::after {
+  position: absolute;
+  content: "";
+  height: 74px;
+  width: 74px;
+  border-color: var(--line);
+  pointer-events: none;
+}
+
+.certificate-frame::before {
+  left: 18px;
+  top: 18px;
+  border-left: 2px solid;
+  border-top: 2px solid;
+}
+
+.certificate-frame::after {
+  right: 18px;
+  bottom: 18px;
+  border-right: 2px solid;
+  border-bottom: 2px solid;
+}
+
+.upload-zone {
+  border: 1.5px dashed var(--line);
+  background: #fffaf4;
+}
+
+.feature-strip {
+  border: 1.5px solid var(--line);
+  background: rgba(255, 253, 248, 0.96);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ffd1ad;
+  border-radius: 999px;
+  background: #fff8ef;
+  padding: 8px 12px;
+  color: #7a3410;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mono {
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    padding: 14px;
+  }
+}

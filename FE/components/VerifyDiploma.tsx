@@ -1,0 +1,200 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Copy, FileBadge, FileText, Loader2, Search } from "lucide-react";
+import { useReadContract } from "wagmi";
+import { bnbSmartChainTestnet } from "@/lib/chains";
+import { CERTICHAIN_ABI, CERTICHAIN_ADDRESS, contractUrl, tokenUrl } from "@/lib/contract";
+import { useSearchParams } from "next/navigation";
+import { gatewayUrl } from "@/lib/pinata";
+
+type IjazahTuple = readonly [string, string, string];
+
+export function VerifyDiploma({ initialTokenId = "1" }: { initialTokenId?: string }) {
+  const searchParams = useSearchParams();
+  const [verifyTokenId, setVerifyTokenId] = useState(initialTokenId);
+  const [loadingFromUuid, setLoadingFromUuid] = useState(false);
+
+  useEffect(() => {
+    // If navigating directly or URL changes with UUID
+    const uuidParam = searchParams.get("uuid");
+    if (uuidParam) {
+      setLoadingFromUuid(true);
+      fetch(`/api/certificates?uuid=${uuidParam}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.certificate?.tokenId) {
+            setVerifyTokenId(String(data.certificate.tokenId));
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoadingFromUuid(false));
+    }
+  }, [searchParams]);
+
+  // Update token ID when prop changes (from table selection)
+  useEffect(() => {
+    if (initialTokenId && initialTokenId !== "1") {
+      setVerifyTokenId(initialTokenId);
+    }
+  }, [initialTokenId]);
+
+  const parsedTokenId = useMemo(() => {
+    if (!/^\d+$/.test(verifyTokenId.trim())) {
+      return undefined;
+    }
+    return BigInt(verifyTokenId.trim());
+  }, [verifyTokenId]);
+
+  const issuedData = useReadContract({
+    address: CERTICHAIN_ADDRESS,
+    abi: CERTICHAIN_ABI,
+    functionName: "dataIjazah",
+    args: [parsedTokenId ?? 0n],
+    chainId: bnbSmartChainTestnet.id,
+    query: {
+      enabled: parsedTokenId !== undefined
+    }
+  });
+
+  const tokenUri = useReadContract({
+    address: CERTICHAIN_ADDRESS,
+    abi: CERTICHAIN_ABI,
+    functionName: "tokenURI",
+    args: [parsedTokenId ?? 0n],
+    chainId: bnbSmartChainTestnet.id,
+    query: {
+      enabled: parsedTokenId !== undefined
+    }
+  });
+
+  const owner = useReadContract({
+    address: CERTICHAIN_ADDRESS,
+    abi: CERTICHAIN_ABI,
+    functionName: "ownerOf",
+    args: [parsedTokenId ?? 0n],
+    chainId: bnbSmartChainTestnet.id,
+    query: {
+      enabled: parsedTokenId !== undefined
+    }
+  });
+
+  const verifiedIjazah = issuedData.data as IjazahTuple | undefined;
+
+  return (
+    <section id="verify" className="grid gap-6 lg:grid-cols-[430px_minmax(0,1fr)] mb-8">
+      <div className="line-panel corner-cut p-6">
+        <div className="mb-5 flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#ff6b00] text-white">
+            <Search size={30} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black">Verify Diploma</h2>
+            <p className="text-sm font-medium text-muted">Read langsung dari smart contract.</p>
+          </div>
+        </div>
+
+        <label className="block">
+          <span className="mb-2 block font-extrabold">Token ID</span>
+          <span className="field-shell">
+            <span className="icon-box h-10 w-10">
+              <FileBadge size={22} />
+            </span>
+            <input
+              value={verifyTokenId}
+              onChange={(event) => setVerifyTokenId(event.target.value)}
+              inputMode="numeric"
+              placeholder="1"
+            />
+          </span>
+        </label>
+
+        <a className="secondary-button mt-5 w-full px-5" href={contractUrl()} target="_blank" rel="noreferrer">
+          <FileText size={20} /> Open Contract
+        </a>
+      </div>
+
+      <div className="line-panel corner-cut p-6">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-black text-[#ff6b00]">ONCHAIN RESULT</p>
+            <h2 className="text-2xl font-black">Certificate Registry</h2>
+          </div>
+          <span className="status-pill mono">chainId {bnbSmartChainTestnet.id}</span>
+        </div>
+
+        {issuedData.isLoading || tokenUri.isLoading || owner.isLoading || loadingFromUuid ? (
+          <div className="flex min-h-48 items-center justify-center rounded-lg border border-[#ffd1ad] bg-[#fff8ef]">
+            <Loader2 className="animate-spin text-[#ff6b00]" size={34} />
+          </div>
+        ) : verifiedIjazah ? (
+          <div className="flex flex-col gap-6">
+            <div className="overflow-hidden rounded-lg border border-[#ffd1ad] bg-white p-3 shadow-sm">
+              <img
+                src={gatewayUrl(verifiedIjazah[2])}
+                alt="Diploma Preview"
+                className="w-full h-auto object-contain rounded"
+              />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <ResultRow label="Nama" value={verifiedIjazah[0] || "-"} />
+              <ResultRow label="Universitas" value={verifiedIjazah[1] || "-"} />
+              <ResultRow label="Diploma URI" value={verifiedIjazah[2] || "-"} copyable />
+              <ResultRow label="Token URI" value={String(tokenUri.data || "-")} copyable />
+              <ResultRow label="Owner" value={String(owner.data || "-")} copyable />
+              <div className="flex items-end">
+                <a
+                  className="secondary-button w-full px-5"
+                  href={tokenUrl(verifyTokenId)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <FileText size={20} /> View Token
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-[#ffd1ad] bg-[#fff8ef] px-5 py-10 text-center font-bold text-[#7a3410]">
+            Masukkan Token ID untuk verifikasi data ijazah.
+          </div>
+        )}
+
+        {issuedData.error || tokenUri.error || owner.error ? (
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+            Token belum ditemukan atau RPC gagal membaca data.
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function ResultRow({
+  label,
+  value,
+  copyable
+}: {
+  label: string;
+  value: string;
+  copyable?: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-[#ffd1ad] bg-white p-4">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-sm font-extrabold text-muted">{label}</p>
+        {copyable ? (
+          <button
+            className="text-[#ff6b00]"
+            onClick={() => navigator.clipboard.writeText(value)}
+            aria-label={`Copy ${label}`}
+            title={`Copy ${label}`}
+          >
+            <Copy size={18} />
+          </button>
+        ) : null}
+      </div>
+      <p className="break-all font-black">{value}</p>
+    </div>
+  );
+}
