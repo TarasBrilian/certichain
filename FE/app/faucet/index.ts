@@ -12,7 +12,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { BSC_TESTNET_RPC_URL, bnbSmartChainTestnet } from "@/lib/chains";
 import { supabase } from "@/lib/db";
 
-const FAUCET_AMOUNT_BNB = "0.005";
+const FAUCET_AMOUNT_BNB = "0.002";
 const COOLDOWN_HOURS = 8;
 const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
 
